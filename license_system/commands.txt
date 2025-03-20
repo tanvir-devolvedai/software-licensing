@@ -1,0 +1,67 @@
+Install Dependencies:
+python3 -m pip install -r requirements.txt
+
+Generate Keys and License:
+python3 license_server.py
+
+This will create:
+private_key.pem (keep this secret!)
+public_key.pem
+license.json
+
+Validate License:
+python3 license_client.py
+
+Successful output:
+✅ License validation successful!
+User ID: mac_user_001
+Tier: premium
+
+Testing Scenarios
+
+Test 1: Tampered License
+
+# Edit license.json (change tier or expiry date)
+nano license.json
+python3 license_client.py
+# Should show "Validation failed: Invalid license signature"
+
+Test 2: Expired License
+
+# In license_server.py, modify:
+expiry_date = datetime.utcnow() - timedelta(days=1)
+Then regenerate license and test.
+
+Test 3: Corrupted Public Key
+
+echo "corrupt" >> public_key.pem
+python3 license_client.py
+# Should show verification error
+
+
+
+Security Best Practices
+
+Private Key Protection
+
+    Never commit private_key.pem to version control
+
+    Store on secure server (not client-side)
+
+    Consider using hardware security modules (HSMs) in production
+
+Client Hardening
+
+    Obfuscate the public key embedding
+
+    Use anti-tamper tools like PyArmor
+
+    Add hardware fingerprint checks
+
+Validation Enhancements
+
+    Add periodic online checks
+
+    Implement license revocation lists
+
+    Use certificate pinning for API calls
